@@ -7,19 +7,39 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+    
+    // Переменная включен или выключен фонарик
+    var isLightOn = true
+    
+    // Функция включающая/выключающая фонарик
+    func updateView() {
+        let device = AVCaptureDevice.default(for: AVMediaType.video)
+        if let dev = device, dev.hasTorch {
+            view.backgroundColor = .black
+            do {
+                try dev.lockForConfiguration()
+                dev.torchMode = isLightOn ? .on : .off
+                dev.unlockForConfiguration()
+            } catch {
+                print(error)
+            }
+        } else {
+            view.backgroundColor = isLightOn ? .white : .black
+        }
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    // Нажатие на кнопку включения/выключения фонарика
+    @IBAction func LightOnButton(_ sender: UIButton) {
+        isLightOn = !isLightOn
+        updateView()
     }
-
-
+    
+    // Убирает статус бар
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
 }
 
